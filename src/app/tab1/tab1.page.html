@@ -1,0 +1,69 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>
+      Category
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <ion-fab slot="fixed" vertical="bottom" horizontal="end">
+    <ion-fab-button (click) = "showCreateModal()">
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+  <ion-list [inset]="true">
+    <ion-item-sliding *ngFor="let category of categories">
+      <ion-item>
+        <ion-label>
+          {{category.name}}
+        </ion-label>
+       
+      </ion-item>
+      <ion-item-options>
+        <ion-item-option color="none" style="padding: 0; margin: 0;">
+          <ion-chip (click)="deleteCategory(category.id)">
+            <ion-icon name="close" style="margin: 0;" color="danger"></ion-icon>
+          </ion-chip>
+          <ion-chip (click)="showEditModal(category)">
+            <ion-icon name="pencil" style="margin: 0;" color="success"></ion-icon>
+          </ion-chip>
+        </ion-item-option>
+      </ion-item-options>
+    </ion-item-sliding>
+  </ion-list>
+  <ion-modal [isOpen]="isShowFormModal" mode="ios">
+    <ng-template>
+      <ion-content>
+        <ion-card>
+          <ion-card-content>
+            <form [formGroup]="categoryForm" (ngSubmit)="submitCategoryForm()">
+                <ion-input 
+                  [hidden] = "true"
+                  formControlName="id" 
+                  fill="outline"
+                  >
+                </ion-input>
+              <ion-item lines="none">
+                <ion-input 
+                  label= "Name"
+                  formControlName="name"  
+                  type="text"
+                  errorText="Name is Required"></ion-input>
+              </ion-item>
+              <div style="display: flex; justify-content: end;"> 
+                <ion-button shape="round" fill="outline" (click)="closeFormModal()">Cancel</ion-button>
+                <ion-button type="submit" shape="round" fill="outline" color="success" [disabled]="categoryForm.invalid" *ngIf="formMode === typeForm.CREATE">Add</ion-button>
+                <ion-button type="submit" shape="round" fill="outline" color="success" [disabled]="categoryForm.invalid" *ngIf="formMode === typeForm.EDIT">Edit</ion-button>
+              </div>
+            </form>
+          </ion-card-content>
+        </ion-card>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+</ion-content>

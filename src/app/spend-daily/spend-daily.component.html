@@ -1,0 +1,22 @@
+<ion-card>
+  <ion-card-content>
+    <div>  
+      <ion-datetime-button datetime="datetimeSpendDailyGroup" slot="end"> </ion-datetime-button>
+      <ion-modal [keepContentsMounted]="true">
+        <ng-template>
+          <ion-datetime
+            id="datetimeSpendDailyGroup"
+            presentation="month-year"
+            [value]="dateFilter.toISOString()"
+            [showDefaultButtons]="true"
+            (ionChange)="handleDateChange($event)"
+            >
+          </ion-datetime>
+        </ng-template>
+      </ion-modal>
+    </div>
+    <div class="chart-container">
+      <canvas  id="spendDailyGroupChart" height="230px" >{{ chart }}</canvas>
+    </div>    
+  </ion-card-content>
+</ion-card>

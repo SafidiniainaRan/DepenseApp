@@ -1,0 +1,164 @@
+
+
+<ion-content [fullscreen]="true">
+  <ion-fab slot="fixed" vertical="bottom" horizontal="end">
+    <ion-fab-button (click) = "showCreateModal()">
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+  <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+  <ion-card>
+    <ion-card-content style="padding: 5;">
+      <ion-item lines="none">
+        <ion-avatar slot="start">
+          <img src="../../assets/images/profil.png" alt="profilUser" />
+        </ion-avatar>
+        <div>
+          <p>Bonjour </p>
+          <h1>Safidiniaina</h1>
+        </div>
+      </ion-item>
+    </ion-card-content>
+  </ion-card>
+
+    <div>  
+      <ion-datetime-button datetime="datetimex" slot="end"> </ion-datetime-button>
+      <ion-modal [keepContentsMounted]="true">
+        <ng-template>
+          <ion-datetime
+            id="datetimex"
+            presentation="month-year"
+            [value]="dateFilter.toISOString()"
+            [showDefaultButtons]="true"
+            (ionChange)="handleDateChange($event)"
+            >
+          </ion-datetime>
+        </ng-template>
+      </ion-modal>
+    </div>
+  <ion-card>
+    <ion-card-content style="padding: 5;">
+      <ion-item lines="none">
+        <ion-icon slot="end" style="font-size: 35px;" name="cash-outline" color="success"></ion-icon>
+        <ion-text slot="start" style="margin-left: 10px; padding: 0;">
+          <h3>Total Spend</h3>
+          <h1 style="font-weight: 600;font-size: 30px;">{{totalSpend.toLocaleString()}} <span style="font-size: 0.5em;">MGA</span></h1>
+        </ion-text>
+      </ion-item>
+    </ion-card-content>
+  </ion-card>
+  <ion-accordion-group *ngFor="let spendGroup of spendGroups">
+    <ion-accordion value="first">
+      <div slot="header">
+        <ion-card mode="ios" button="true" style="margin-bottom: 0; margin-top: 10px; ">
+          <ion-grid style="margin: 0;">
+            <ion-row class="ion-align-items-center">
+              <ion-col style="padding: 0; margin: 0;">
+                <ion-card-header>
+                  <ion-card-title >{{spendGroup.date.getDate()}}</ion-card-title>
+                  <ion-card-subtitle>{{spendGroup.date.toLocaleDateString('fr-FR',{weekday: 'long'})}}</ion-card-subtitle>
+                </ion-card-header>
+              </ion-col>
+              <ion-col style="text-align: end;">
+                <ion-chip>
+                  <ion-text>
+                    <h3>{{spendGroup.total.toLocaleString()}} <span style="font-size: 0.5em;">Ariary</span></h3>
+                  </ion-text>
+                </ion-chip>
+              </ion-col>
+            </ion-row>
+          </ion-grid>
+        </ion-card>
+      </div>
+      <div slot="content">
+        <ion-card mode="ios" style="margin-top: 5px;">
+          <ion-card-content >
+            <ion-list>
+              <ion-item-sliding *ngFor="let spend of spendGroup.spends">
+                <ion-item>
+                  <ion-label>{{spend.category}}
+                    <p><ion-note style="font-size: 0.9em;">{{spend.description}}</ion-note></p>
+                  </ion-label>
+                  <ion-label slot="end">{{spend.amount.toLocaleString()}}</ion-label>
+                </ion-item>
+                <ion-item-options>
+                  <ion-item-option color="none" style="padding: 0; margin: 0;">
+                    <ion-chip (click)="deleteSpend(spend.id)">
+                      <ion-icon name="close" style="margin: 0;" color="danger"></ion-icon>
+                    </ion-chip>
+                    <ion-chip (click)="showEditModal(spend)">
+                      <ion-icon name="pencil" style="margin: 0;" color="success"></ion-icon>
+                    </ion-chip>
+                  </ion-item-option>
+                </ion-item-options>
+              </ion-item-sliding>
+            </ion-list>
+           
+              
+            <ion-buttons class="ion-justify-content-center">
+              <ion-button (click) = "showCreateModal(spendGroup.date)">
+                <ion-icon name="add"></ion-icon>
+              </ion-button>
+            </ion-buttons>
+          </ion-card-content>
+        </ion-card>
+      </div>
+    </ion-accordion>
+  </ion-accordion-group>
+  <ion-modal [isOpen]="isShowFormModal" mode="ios">
+    <ng-template>
+      <ion-content>
+        <ion-card>
+          <ion-card-content>
+            <form [formGroup]="spendForm" (ngSubmit)="submitSpendForm()">
+              <div>  
+                <ion-datetime-button datetime="datetime" slot="end"> </ion-datetime-button>
+                <ion-modal [keepContentsMounted]="true">
+                  <ng-template>
+                    <ion-datetime
+                      mode="md"
+                      id="datetime"
+                      presentation="date"
+                      formControlName="date" 
+                      [showDefaultButtons]="true"
+                      >
+                    </ion-datetime>
+                  </ng-template>
+                </ion-modal>
+              </div>
+              <ion-item lines="none">
+                <ion-select label= "Category" 
+                  justify="start"
+                  formControlName="idCategory" 
+                  fill="outline"
+                  errorText="Category is Required">
+                  <ion-select-option [value]="c.id" *ngFor="let c of categories">{{c.name}}</ion-select-option>
+                </ion-select>
+              </ion-item>
+              <ion-item lines="none">
+                <ion-input 
+                  label= "Amount  "
+                  formControlName="amount"  
+                  type="number"
+                  errorText="Amount is Required"></ion-input>
+              </ion-item>
+              <ion-item>
+                <ion-input 
+                  label= "Description"
+                  formControlName="description">
+                </ion-input>
+              </ion-item>
+              <div style="display: flex; justify-content: end;"> 
+                <ion-button shape="round" fill="outline" (click)="closeFormModal()">Cancel</ion-button>
+                <ion-button type="submit" shape="round" fill="outline" color="success" [disabled]="spendForm.invalid" *ngIf="formMode === typeForm.CREATE">Add</ion-button>
+                <ion-button type="submit" shape="round" fill="outline" color="success" [disabled]="spendForm.invalid" *ngIf="formMode === typeForm.EDIT">Edit</ion-button>
+              </div>
+            </form>
+          </ion-card-content>
+        </ion-card>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+</ion-content>
